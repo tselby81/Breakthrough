@@ -28,11 +28,11 @@ FPS = 10
 # CREATE THE MAIN GAME WINDOW
 GRID_SIZE = 75
 
-WIN_HEIGHT = (len(gameboard)*GRID_SIZE)
-WIN_WIDTH = (len(gameboard[0])*GRID_SIZE)
+WIN_HEIGHT = len(gameboard)*GRID_SIZE
+WIN_WIDTH = (len(gameboard[0])*GRID_SIZE) + (GRID_SIZE*2)
 
 
-WIN = pygame.display.set_mode((WIN_WIDTH + (GRID_SIZE*2), WIN_HEIGHT + (GRID_SIZE*2)))
+WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pygame.display.set_caption("Breakthrough")
 
 
