@@ -50,8 +50,8 @@ LIGHT_BOARD_SQUARE = pygame.transform.scale(pygame.image.load(os.path.join('asse
 
 def draw_game_board(surface):
 
-    for y in range(0, int(WIN_HEIGHT + GRID_SIZE*4)):
-        for x in range(0, int(WIN_WIDTH + GRID_SIZE*4)):
+    for y in range(0, len(gameboard)):
+        for x in range(0, len(gameboard[0])):
             if (x+y) % 2 == 0:
                 # r = pygame.Rect((x * GRID_SIZE, y * GRID_SIZE), (GRID_SIZE, GRID_SIZE))
                 # pygame.draw.rect(surface, pygame.Color(LIGHT_PURPLE), r)
