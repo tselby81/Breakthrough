@@ -25,30 +25,36 @@ gameboard = [['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'],
 
 FPS = 10
 
-# CREATE THE MAIN GAME WINDOW
 GRID_SIZE = 75
 
 WIN_HEIGHT = len(gameboard)*GRID_SIZE
-WIN_WIDTH = (len(gameboard[0])*GRID_SIZE) + (GRID_SIZE*2)
+WIN_WIDTH = (len(gameboard[0])*GRID_SIZE) + (GRID_SIZE*4)
+
+BOARD_HEIGHT = len(gameboard)*GRID_SIZE
+BOARD_WIDTH = (len(gameboard[0])*GRID_SIZE)
 
 
-WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+# CREATE A DISPLAY SURFACE
+WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Breakthrough")
 
 
 # COLORS TO BE USED TEMPORARILY
 # BOARD SQUARES AND PIECE COLORS WILL BE REPLACED WITH IMAGES
-LIGHT_PURPLE = (199, 164, 222)  # Light squares
-PURPLISH_BLACK = (14, 11, 15)   # Dark squares
 WHITE = (255, 255, 255)         # White pieces
 BLACK = (0, 0, 0)               # Black pieces
 
 # Images
+moon = pygame.image.load(os.path.join('assets', 'Moon.jpg'))
 DARK_BOARD_SQUARE = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'SpaceDark.png')), (GRID_SIZE, GRID_SIZE))
+DARK_BOARD_SQUARE.convert()
+DARK_BOARD_SQUARE_rect = DARK_BOARD_SQUARE.get_rect()
 LIGHT_BOARD_SQUARE = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'SpaceLight.png')), (GRID_SIZE, GRID_SIZE))
+LIGHT_BOARD_SQUARE.convert()
+LIGHT_BOARD_SQUARE_rect = LIGHT_BOARD_SQUARE.get_rect()
 
 
-def draw_game_board(surface):
+def draw_game_board():
 
     for y in range(0, len(gameboard)):
         for x in range(0, len(gameboard[0])):
@@ -61,14 +67,14 @@ def draw_game_board(surface):
             else:
                 # r = pygame.Rect((x * GRID_SIZE, y * GRID_SIZE), (GRID_SIZE, GRID_SIZE))
                 # pygame.draw.rect(surface, pygame.Color(PURPLISH_BLACK), r)
+                pygame.draw.rect(WIN, WHITE, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE), 1)
                 WIN.blit(DARK_BOARD_SQUARE, (x * GRID_SIZE, y * GRID_SIZE))
                 pygame.draw.rect(WIN, WHITE, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE), 1)
 
 
 def draw_pieces():
-    WIN.fill("lightslategrey")
 
-    draw_game_board(WIN)
+    draw_game_board()
 
     for row in range(len(gameboard)):
         for col in range(len(gameboard[row])):
@@ -92,18 +98,27 @@ def main():
     
     # Clock item to control how many times we loop per second
     clock = pygame.time.Clock()
+    
+    def redraw_window():
+        WIN.fill(BLACK)
+        moon_size = ((WIN.get_width()), (WIN.get_height()))
+        MOON = pygame.transform.scale(moon, moon_size)
+        MOON.convert()
+        WIN.blit(MOON, (0, 0))
+
+        pygame.display.update()
 
     run = True
     while run:
         clock.tick(FPS)
+        redraw_window()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
         draw_pieces()
 
-    # for row in GAMEBOARD:
-    #     print(''.join(row) + '\n')
     pygame.quit()
 
 
