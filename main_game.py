@@ -4,6 +4,7 @@ import time
 from miniMax_agent import *
 from alpha_beta_agent import *
 from logic import *
+pygame.font.init()
 
 """
 Main file which runs the game.
@@ -39,7 +40,7 @@ pygame.display.set_caption("Breakthrough")
 WHITE = (255, 255, 255)         # White pieces
 BLACK = (0, 0, 0)               # Black pieces
 
-# Images
+# LOAD IMAGES
 moon = pygame.image.load(os.path.join('assets', 'Moon.jpg'))
 
 DARK_BOARD_SQUARE = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'SpaceDark.png')), (GRID_SIZE, GRID_SIZE))
@@ -68,6 +69,9 @@ WINNER_P1_rect = None
 WINNER_P2 = None
 WINNER_P2_rect = None
 
+# FONTS
+PIXEL_FONT = pygame.font.Font(os.path.join('assets', 'pixelfont.ttf'), 20)
+
 
 """
 Main Game Loop.
@@ -85,6 +89,21 @@ def main():
         MOON = pygame.transform.scale(moon, moon_size)
         MOON.convert()
         WIN.blit(MOON, (0, 0))
+
+        # DRAW TEXT LABELS FOR "RESET", "AI MOVE", AND "AUTO PLAY" BUTTONS
+        reset = PIXEL_FONT.render(f"Reset Board", 1, WHITE)
+        reset_rect = reset.get_rect()
+        reset_rect.center = ((WIN.get_width()) - (reset.get_width())*.85, (WIN.get_height()*.33)-35)
+        ai_move = PIXEL_FONT.render(f"Computer Move", 1, WHITE)
+        ai_move_rect = ai_move.get_rect()
+        ai_move_rect.center = ((WIN.get_width()) - (reset.get_width())*.85, (WIN.get_height()*.66)-35)
+        auto_play = PIXEL_FONT.render(f"Simulate Game", 1, WHITE)
+        auto_play_rect = auto_play.get_rect()
+        auto_play_rect.center = ((WIN.get_width()) - (reset.get_width())*.85, (WIN.get_height()*.99)-35)
+
+        WIN.blit(reset, reset_rect)
+        WIN.blit(ai_move, ai_move_rect)
+        WIN.blit(auto_play, auto_play_rect)
 
         pygame.display.update()
 
@@ -117,6 +136,8 @@ def draw_game_board():
             else:
                 WIN.blit(DARK_BOARD_SQUARE, (x * GRID_SIZE, y * GRID_SIZE))
                 pygame.draw.rect(WIN, WHITE, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE), 1)
+
+    pygame
 
 
 def draw_pieces():
