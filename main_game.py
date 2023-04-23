@@ -23,7 +23,7 @@ gameboard = [['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'],
              ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],
              ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w']]
 
-FPS = 10
+FPS = 15
 
 GRID_SIZE = 75
 
