@@ -1,7 +1,7 @@
 
 from model import *
 
-class AlphaBetaAgent:
+class Alpha_Beta_Agent:
     def __init__(self, board_matrix: List[List[int]], turn: int, depth: int, function, type=0):
         self.board_matrix = board_matrix
         self.turn = turn
