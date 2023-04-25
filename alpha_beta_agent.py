@@ -1,5 +1,5 @@
 
-from model import *
+from logic import *
 
 class Alpha_Beta_Agent:
     def __init__(self, board_matrix: List[List[int]], turn: int, depth: int, function, type=0):

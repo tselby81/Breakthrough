@@ -18,10 +18,10 @@ initial_boardmatrix =  [[1, 1, 1, 1, 1, 1, 1, 1],
                         [2, 2, 2, 2, 2, 2, 2, 2]]
 
 
-MAXNUM = float("inf")
-MINNUM = -float("inf")
-MAXTUPLE = (MAXNUM, MAXNUM)
-MINTUPLE = (MINNUM, MINNUM)
+MAXVAL = float("inf")
+MINVAL = -float("inf")
+MAXTUPLE = (MAXVAL, MAXVAL)
+MINTUPLE = (MINVAL, MINVAL)
 
 # direction: 1 -> left, 2 -> middle, 3 -> right
 def single_move(initial_pos, direction, turn):
