@@ -207,13 +207,20 @@ def get_available_moves(self):
         possible_moves.append((row+move_direction, col))
 
 
-    # Move diagonally (without capturing)
-    if self.is_valid_move(row+move_direction, col+1) and self.gameboard[row+move_direction][col+1] == '.':
-        possible_moves.append((row+move_direction, col+1))
+   # Move diagonally
+    if player == 'b':
+        if self.is_valid_move(row+move_direction, col+1) and self.gameboard[row+move_direction][col+1] == '.' or self.is_valid_move(row+move_direction, col-1) and self.gameboard[row+move_direction][col+1] == 'w':
+            possible_moves.append((row+move_direction, col+1))
 
-    if self.is_valid_move(row+move_direction, col-1) and self.gameboard[row+move_direction][col-1] == '.':
-        possible_moves.append((row+move_direction, col-1))
+        if self.is_valid_move(row+move_direction, col-1) and self.gameboard[row+move_direction][col-1] == '.' or self.is_valid_move(row+move_direction, col-1) and self.gameboard[row+move_direction][col-1] == 'w':
+            possible_moves.append((row+move_direction, col-1))
+    else:
+        if self.is_valid_move(row+move_direction, col+1) and self.gameboard[row+move_direction][col+1] == '.' or self.is_valid_move(row+move_direction, col-1) and self.gameboard[row+move_direction][col+1] == 'b':
+            possible_moves.append((row+move_direction, col+1))
 
+        if self.is_valid_move(row+move_direction, col-1) and self.gameboard[row+move_direction][col-1] == '.' or self.is_valid_move(row+move_direction, col-1) and self.gameboard[row+move_direction][col-1] == 'b':
+            possible_moves.append((row+move_direction, col-1))
+    
     return possible_moves
 
 
