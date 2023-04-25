@@ -173,8 +173,48 @@ def check_collision():
     pass
 
 
-def check_available_moves():
-    pass
+def is_valid_move(self):
+    if (self.boardmatrix[self.ori_x][self.ori_y] == 'b'
+        and self.boardmatrix[self.new_x][self.new_y] != 'b'
+        and self.new_x - self.ori_x == 'b'
+        and self.ori_y - 1 <= self.new_y <= self.ori_y + 1
+        and not (self.ori_y == self.new_y and self.boardmatrix[self.new_x][self.new_y] == 'w')) \
+        or (self.boardmatrix[self.ori_x][self.ori_y] == 'w'
+            and self.boardmatrix[self.new_x][self.new_y] != 'w'
+            and self.ori_x - self.new_x == 'b'
+            and self.ori_y - 1 <= self.new_y <= self.ori_y + 1
+            and not (self.ori_y == self.new_y and self.boardmatrix[self.new_x][self.new_y] == 'b')):
+        return 1
+    return 0
+
+def get_available_moves(self):
+    #Returns a list of all possible moves for a given piece.
+    possible_moves = []
+    piece = self.boardmatrix[row][col]
+    if piece == '.':
+        return []
+
+    player = piece.lower()
+
+    # Check the direction of the piece based on the player
+    if player == 'b':
+        move_direction = -1
+    else:
+        move_direction = 1
+
+    # Move one step forward
+    if self.is_valid_move(row+move_direction, col) and self.gameboard[row+move_direction][col] == '.':
+        possible_moves.append((row+move_direction, col))
+
+
+    # Move diagonally (without capturing)
+    if self.is_valid_move(row+move_direction, col+1) and self.gameboard[row+move_direction][col+1] == '.':
+        possible_moves.append((row+move_direction, col+1))
+
+    if self.is_valid_move(row+move_direction, col-1) and self.gameboard[row+move_direction][col-1] == '.':
+        possible_moves.append((row+move_direction, col-1))
+
+    return possible_moves
 
 
 def check_win():
