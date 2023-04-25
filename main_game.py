@@ -11,7 +11,7 @@ Main file which runs the game.
 Draws the various game elements.
 Main game loop which calls the various functions and updates the window.
 Get
-"""
+""" 
 # Matrix to define the starting gameboard
 # '.' - Empty, 'b' - black piece, 'w' - white piece
 gameboard = []
@@ -33,7 +33,7 @@ WIN_WIDTH = (len(gameboard[0])*GRID_SIZE) + (GRID_SIZE*4)
 
 # CREATE A DISPLAY SURFACE
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT), pygame.RESIZABLE)
-pygame.display.set_caption("Breakthrough")
+pygame.display.set_caption("Breakthrough Galactic!")
 
 # COLORS TO BE USED TEMPORARILY
 # BOARD SQUARES AND PIECE COLORS WILL BE REPLACED WITH IMAGES
@@ -108,20 +108,19 @@ def main():
         pygame.display.update()
 
     run = True
-    while run:
-        clock.tick(FPS)
+    if run:
+    
         redraw_window()
-
+        draw_game_board()
+        draw_pieces()
+        # Update the window to display what has been drawn in the loop
+        #pygame.display.update()
+    
+    while run:
+      clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-
-        draw_game_board()
-        draw_pieces()
-
-        # Update the window to display what has been drawn in the loop
-        pygame.display.update()
-
     pygame.quit()
 
 
@@ -137,7 +136,7 @@ def draw_game_board():
                 WIN.blit(DARK_BOARD_SQUARE, (x * GRID_SIZE, y * GRID_SIZE))
                 pygame.draw.rect(WIN, WHITE, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE), 1)
 
-    pygame
+    pygame.display.update()
 
 
 def draw_pieces():
@@ -147,10 +146,13 @@ def draw_pieces():
             if gameboard[row][col] == 'b':
                 P1_rect.center = ((col*GRID_SIZE)+(GRID_SIZE/2), (row*GRID_SIZE)+(GRID_SIZE/2))
                 gameboard[row][col] = WIN.blit(P1, P1_rect)
+                
 
             elif gameboard[row][col] == 'w':
                 P2_rect.center = ((col*GRID_SIZE)+(GRID_SIZE/2), (row*GRID_SIZE)+(GRID_SIZE/2))
                 gameboard[row][col] = WIN.blit(P2, P2_rect)
+
+    pygame.display.update()
 
 
 def player_turn():
@@ -181,4 +183,3 @@ def check_win():
 
 if __name__ == "__main__":
     main()
-
