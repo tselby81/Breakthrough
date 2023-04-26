@@ -7,7 +7,6 @@ class AlphaBetaAgent:
         self.maxdepth = depth
         self.function = function
         self.type = type
-
         self.nodes = 0
         self.piece_num = 0
 
