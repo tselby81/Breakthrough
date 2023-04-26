@@ -1,3 +1,4 @@
+from numpy import row_stack
 import pygame
 import sys, os, math
 import time
@@ -6,179 +7,389 @@ from alpha_beta_agent import *
 from logic import *
 pygame.font.init()
 
-"""
-Main file which runs the game.
-Draws the various game elements.
-Main game loop which calls the various functions and updates the window.
-Get
-"""
-# Matrix to define the starting gameboard
-# '.' - Empty, 'b' - black piece, 'w' - white piece
-gameboard = []
-gameboard = [['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'],
-             ['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'],
-             ['.', '.', '.', '.', '.', '.', '.', '.'],
-             ['.', '.', '.', '.', '.', '.', '.', '.'],
-             ['.', '.', '.', '.', '.', '.', '.', '.'],
-             ['.', '.', '.', '.', '.', '.', '.', '.'],
-             ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'],
-             ['w', 'w', 'w', 'w', 'w', 'w', 'w', 'w']]
-
-FPS = 1
-
 GRID_SIZE = 75
-
-WIN_HEIGHT = len(gameboard)*GRID_SIZE
-WIN_WIDTH = (len(gameboard[0])*GRID_SIZE) + (GRID_SIZE*4)
-
-# CREATE A DISPLAY SURFACE
-WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT), pygame.RESIZABLE)
-pygame.display.set_caption("Breakthrough")
-
 # COLORS TO BE USED TEMPORARILY
 # BOARD SQUARES AND PIECE COLORS WILL BE REPLACED WITH IMAGES
 WHITE = (255, 255, 255)         # White pieces
 BLACK = (0, 0, 0)               # Black pieces
 
-# LOAD IMAGES
-moon = pygame.image.load(os.path.join('assets', 'Moon.jpg'))
 
-DARK_BOARD_SQUARE = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'SpaceDark.png')), (GRID_SIZE, GRID_SIZE))
-DARK_BOARD_SQUARE.convert()
-DARK_BOARD_SQUARE_rect = DARK_BOARD_SQUARE.get_rect()
-LIGHT_BOARD_SQUARE = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'SpaceLight.png')), (GRID_SIZE, GRID_SIZE))
-LIGHT_BOARD_SQUARE.convert()
-LIGHT_BOARD_SQUARE_rect = LIGHT_BOARD_SQUARE.get_rect()
-
-RESET_BTN = None
-RESET_BTN_rect = None
-AI_MOVE_BTN = None
-AI_MOVE_BTN_rect = None
-AUTOPLAY_BTN = None
-AUTOPLAY_BTN_rect = None
-
-PLAYER1 = pygame.image.load(os.path.join('assets', 'alien1.png'))
-P1 = pygame.transform.scale(PLAYER1, (60, 60)).convert_alpha()
-P1_rect = P1.get_rect()
-PLAYER2 = pygame.image.load(os.path.join('assets', 'alien2.png'))
-P2 = pygame.transform.scale(PLAYER2, (60, 60)).convert_alpha()
-P2_rect = P2.get_rect()
-
-WINNER_P1 = None
-WINNER_P1_rect = None
-WINNER_P2 = None
-WINNER_P2_rect = None
-
-# FONTS
-PIXEL_FONT = pygame.font.Font(os.path.join('assets', 'pixelfont.ttf'), 20)
-
-
-"""
-Main Game Loop.
-This should hold things related to game logic.
-Other specialized functions should be written outside and called in the game loop when needed
-"""
-def main():
+class BreakthroughG:
     
-    # Clock item to control how many times we loop per second
-    clock = pygame.time.Clock()
-    
-    def redraw_window():
-        WIN.fill(BLACK)
-        moon_size = ((WIN.get_width()), (WIN.get_height()))
-        MOON = pygame.transform.scale(moon, moon_size)
-        MOON.convert()
-        WIN.blit(MOON, (0, 0))
+    moon = pygame.image.load(os.path.join('assets', 'Moon.jpg'))
 
-        # DRAW TEXT LABELS FOR "RESET", "AI MOVE", AND "AUTO PLAY" BUTTONS
-        reset = PIXEL_FONT.render(f"Reset Board", 1, WHITE)
-        reset_rect = reset.get_rect()
-        reset_rect.center = ((WIN.get_width()) - (reset.get_width())*.85, (WIN.get_height()*.33)-35)
-        ai_move = PIXEL_FONT.render(f"Computer Move", 1, WHITE)
-        ai_move_rect = ai_move.get_rect()
-        ai_move_rect.center = ((WIN.get_width()) - (reset.get_width())*.85, (WIN.get_height()*.66)-35)
-        auto_play = PIXEL_FONT.render(f"Simulate Game", 1, WHITE)
-        auto_play_rect = auto_play.get_rect()
-        auto_play_rect.center = ((WIN.get_width()) - (reset.get_width())*.85, (WIN.get_height()*.99)-35)
+    DARK_BOARD_SQUARE = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'SpaceDark.png')), (GRID_SIZE, GRID_SIZE))
+    DARK_BOARD_SQUARE_rect = DARK_BOARD_SQUARE.get_rect()
+    LIGHT_BOARD_SQUARE = pygame.transform.scale(pygame.image.load(os.path.join('assets', 'SpaceLight.png')), (GRID_SIZE, GRID_SIZE))
+    LIGHT_BOARD_SQUARE_rect = LIGHT_BOARD_SQUARE.get_rect()
 
-        WIN.blit(reset, reset_rect)
-        WIN.blit(ai_move, ai_move_rect)
-        WIN.blit(auto_play, auto_play_rect)
+    RESET_BTN = None
+    RESET_BTN_rect = None
+    AI_MOVE_BTN = None
+    AI_MOVE_BTN_rect = None
+    AUTOPLAY_BTN = None
+    AUTOPLAY_BTN_rect = None
 
-        pygame.display.update()
+    PLAYER1 = pygame.image.load(os.path.join('assets', 'alien1.png'))
+    P1 = pygame.transform.scale(PLAYER1, (60, 60))
+    P1_rect = P1.get_rect()
+    PLAYER2 = pygame.image.load(os.path.join('assets', 'alien2.png'))
+    P2 = pygame.transform.scale(PLAYER2, (60, 60))
+    P2_rect = P2.get_rect()
 
-    run = True
-    while run:
-        clock.tick(FPS)
-        redraw_window()
+    def __init__(self):
+        pygame.init()
+        self.width, self.height = (len(initial_gameboard[0])*GRID_SIZE) + (GRID_SIZE*4), (len(initial_gameboard)*GRID_SIZE)
+        self.sizeofcell = int(560/8)
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
+        self.screen.fill([255, 255, 255])
+        # board and pieces
+        self.board = 0
+        self.blackchess = 0
+        self.whitechess = 0
+        self.outline = 0
+        self.reset = 0
+        self.winner = 0
+        self.computer = None
 
+        # status 0: origin;  1: ready to move; 2: end
+        # turn 1: black 2: white
+        self.status = 0
+        self.turn = 1
+        # Variable for moving
+        self.ori_x = 0
+        self.ori_y = 0
+        self.new_x = 0
+        self.new_y = 0
+
+        # matrix for position of chess, 0 - empty, 1 - black, 2 - white
+        self.gameboard = [[1, 1, 1, 1, 1, 1, 1, 1],
+                            [1, 1, 1, 1, 1, 1, 1, 1],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [2, 2, 2, 2, 2, 2, 2, 2],
+                            [2, 2, 2, 2, 2, 2, 2, 2]]
+
+        self.total_nodes_1 = 0
+        self.total_nodes_2 = 0
+        self.total_time_1 = 0
+        self.total_time_2 = 0
+        self.total_step_1 = 0
+        self.total_step_2 = 0
+        self.eat_piece = 0
+        # Caption
+        pygame.display.set_caption("Breakthrough Galactic!")
+        # initialize pygame clock
+        self.clock = pygame.time.Clock()
+        self.initgraphics()
+
+    def run(self):
+        self.clock.tick(60)
+
+        # clear the screen
+        self.screen.fill([255, 255, 255])
+
+
+        if self.status == 5:
+            # Black
+            if self.turn == 1:
+                start = time.process_time()
+                self.ai_move(2, 2)
+                self.total_time_1 += (time.process_time() - start)
+                self.total_step_1 += 1
+                print('total_step_1 = ', self.total_step_1,
+                      'total_nodes_1 = ', self.total_nodes_1,
+                      'node_per_move_1 = ', self.total_nodes_1 / self.total_step_1,
+                      'time_per_move_1 = ', self.total_time_1 / self.total_step_1,
+                      'have_eaten = ', self.eat_piece)
+            elif self.turn == 2:
+                start = time.process_time()
+                self.ai_move(2, 2)
+                self.total_time_2 += (time.process_time() - start)
+                self.total_step_2 += 1
+                print('total_step_2 = ', self.total_step_2,
+                      'total_nodes_2 = ', self.total_nodes_2,
+                      'node_per_move_2 = ', self.total_nodes_2 / self.total_step_2,
+                      'time_per_move_2 = ', self.total_time_2 / self.total_step_2,
+                      'have_eaten: ', self.eat_piece)
+
+        # Events accepting
         for event in pygame.event.get():
+            # Quit if close the windows
             if event.type == pygame.QUIT:
-                run = False
+                exit()
+            # reset button pressed
+            elif event.type == pygame.MOUSEBUTTONDOWN and self.isreset(event.pos):
+                self.gameboard = [[1, 1, 1, 1, 1, 1, 1, 1],
+                            [1, 1, 1, 1, 1, 1, 1, 1],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [2, 2, 2, 2, 2, 2, 2, 2],
+                            [2, 2, 2, 2, 2, 2, 2, 2]]
+                self.turn = 1
+                self.status = 0
+            # computer button pressed
+            elif event.type == pygame.MOUSEBUTTONDOWN and self.iscomputer(event.pos):
+                self.ai_move_alphabeta(1)
+                # self.ai_move_minimax()
 
-        draw_game_board()
-        draw_pieces()
+            elif event.type == pygame.MOUSEBUTTONDOWN and self.isauto(event.pos):
+                self.status = 5
 
-        # Update the window to display what has been drawn in the loop
+            # ====================================================================================
+            # select chess
+            elif event.type == pygame.MOUSEBUTTONDOWN and self.status == 0:
+                x, y = event.pos
+                coor_y = math.floor(x / self.sizeofcell)
+                coor_x = math.floor(y / self.sizeofcell)
+                if self.gameboard[coor_x][coor_y] == self.turn:
+                    self.status = 1
+                    self.ori_y = math.floor(x / self.sizeofcell)
+                    self.ori_x = math.floor(y / self.sizeofcell)
+            # check whether the selected chess can move, otherwise select other chess
+            elif event.type == pygame.MOUSEBUTTONDOWN and self.status == 1:
+                x, y = event.pos
+                self.new_y = math.floor(x / self.sizeofcell)
+                self.new_x = math.floor(y / self.sizeofcell)
+                if self.isabletomove():
+                    self.movechess()
+                    if (self.new_x == 7 and self.gameboard[self.new_x][self.new_y] == 1) \
+                        or (self.new_x == 0 and self.gameboard[self.new_x][self.new_y] == 2):
+                        self.status = 3
+                elif self.gameboard[self.new_x][self.new_y] == self.gameboard[self.ori_x][self.ori_y]:
+                    self.ori_x = self.new_x
+                    self.ori_y = self.new_y
+                    # display the board and chess
+        self.display()
+        # update the screen
+        pygame.display.flip()
+
+    # load the graphics and rescale them
+    def initgraphics(self):
+        # LOAD IMAGES
+        self.board = pygame.image.load_extended(os.path.join('assets', 'galacticboard.png'))
+        self.board = pygame.transform.scale(self.board, (560, 560))
+        self.blackchess = pygame.image.load_extended(os.path.join('assets', 'alien1.png'))
+        self.blackchess = pygame.transform.scale(self.blackchess, (self.sizeofcell- 20, self.sizeofcell - 20))
+        self.whitechess = pygame.image.load_extended(os.path.join('assets', 'alien2.png'))
+        self.whitechess = pygame.transform.scale(self.whitechess, (self.sizeofcell - 20, self.sizeofcell - 20))
+        self.outline = pygame.image.load_extended(os.path.join('assets', 'square-outline.png'))
+        self.outline = pygame.transform.scale(self.outline, (self.sizeofcell, self.sizeofcell))
+        self.reset = pygame.image.load_extended(os.path.join('assets', 'reset.jpg'))
+        self.reset = pygame.transform.scale(self.reset, (80, 80))
+        self.winner = pygame.image.load_extended(os.path.join('assets', 'winner.png'))
+        self.winner = pygame.transform.scale(self.winner, (250, 250))
+        self.computer = pygame.image.load_extended(os.path.join('assets', 'computer.png'))
+        self.computer = pygame.transform.scale(self.computer, (80, 80))
+        self.auto = pygame.image.load_extended(os.path.join('assets', 'auto.png'))
+        self.auto = pygame.transform.scale(self.auto, (80, 80))
+    #Draws the game board
+    def draw_game_board(self):
+
+    
+        for y in range(0, len(self.gameboard)):
+            for x in range(0, len(self.gameboard[0])):
+                if (x+y) % 2 == 0:
+                    self.screen.blit(self.LIGHT_BOARD_SQUARE, (x * GRID_SIZE, y * GRID_SIZE))
+                    pygame.draw.rect(self.screen, WHITE, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE), 1)
+                    
+                else:
+                    self.screen.blit(self.DARK_BOARD_SQUARE, (x * GRID_SIZE, y * GRID_SIZE))
+                    pygame.draw.rect(self.screen, WHITE, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE), 1)
+
         pygame.display.update()
 
-    pygame.quit()
+    #Draws the game pieces
+    def draw_pieces(self):
+
+        for row in range(len(self.gameboard)):
+            for col in range(len(self.gameboard[row])):
+                if self.gameboard[row][col] == 1:
+                    self.P1_rect.center = ((col*GRID_SIZE)+(GRID_SIZE/2), (row*GRID_SIZE)+(GRID_SIZE/2))
+                    self.gameboard[row][col] = self.screen.blit(self.P1, self.P1_rect)
+                    
+
+                elif self.gameboard[row][col] == 2:
+                    self.P2_rect.center = ((col*GRID_SIZE)+(GRID_SIZE/2), (row*GRID_SIZE)+(GRID_SIZE/2))
+                    self.gameboard[row][col] = self.screen.blit(self.P2, self.P2_rect)
+
+        pygame.display.update()
 
 
-def draw_game_board():
+    # display the graphics in the window
+    def display(self):
+        self.screen.blit(self.board, (0, 0))
+        self.screen.blit(self.reset, (590, 50))
+        self.screen.blit(self.computer, (590, 200))
+        self.screen.blit(self.auto, (590, 340))
+        for i in range(8):
+            for j in range(8):
+                if self.gameboard[i][j] == 1:
+                    self.screen.blit(self.blackchess, (self.sizeofcell * j + 10, self.sizeofcell * i + 10))
+                elif self.gameboard[i][j] == 2:
+                    self.screen.blit(self.whitechess, (self.sizeofcell * j + 10, self.sizeofcell * i + 10))
+        if self.status == 1:
+            # only downward is acceptable
+            if self.gameboard[self.ori_x][self.ori_y] == 1:
+                x1 = self.ori_x + 1
+                y1 = self.ori_y - 1
+                x2 = self.ori_x + 1
+                y2 = self.ori_y + 1
+                x3 = self.ori_x + 1
+                y3 = self.ori_y
+                # left down
+                if y1 >= 0 and self.gameboard[x1][y1] != 1:
+                    self.screen.blit(self.outline,
+                                     (self.sizeofcell * y1, self.sizeofcell * x1))
+                # right down
+                if y2 <= 7 and self.gameboard[x2][y2] != 1:
+                    self.screen.blit(self.outline,
+                                     (self.sizeofcell * y2, self.sizeofcell * x2))
+                # down
+                if x3 <= 7 and self.gameboard[x3][y3] == 0:
+                    self.screen.blit(self.outline,
+                                     (self.sizeofcell * y3, self.sizeofcell * x3))
 
-    for y in range(0, len(gameboard)):
-        for x in range(0, len(gameboard[0])):
-            if (x+y) % 2 == 0:
-                WIN.blit(LIGHT_BOARD_SQUARE, (x * GRID_SIZE, y * GRID_SIZE))
-                pygame.draw.rect(WIN, WHITE, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE), 1)
-                
+            if self.gameboard[self.ori_x][self.ori_y] == 2:
+                x1 = self.ori_x - 1
+                y1 = self.ori_y - 1
+                x2 = self.ori_x - 1
+                y2 = self.ori_y + 1
+                x3 = self.ori_x - 1
+                y3 = self.ori_y
+                # left up
+                if y1 >= 0 and self.gameboard[x1][y1] != 2:
+                    self.screen.blit(self.outline,
+                                     (self.sizeofcell * y1, self.sizeofcell * x1))
+                # right up
+                if y2 <= 7 and self.gameboard[x2][y2] != 2:
+                    self.screen.blit(self.outline,
+                                     (self.sizeofcell * y2, self.sizeofcell * x2))
+                # up
+                if x3 >= 0 and self.gameboard[x3][y3] == 0:
+                    self.screen.blit(self.outline,
+                                     (self.sizeofcell * y3, self.sizeofcell * x3))
+        if self.status == 3:
+            self.screen.blit(self.winner, (100, 100))
+
+    def movechess(self):
+        self.gameboard[self.new_x][self.new_y] = self.gameboard[self.ori_x][self.ori_y]
+        self.gameboard[self.ori_x][self.ori_y] = 0
+        if self.turn == 1:
+            self.turn = 2
+        elif self.turn == 2:
+            self.turn = 1
+        self.status = 0
+
+    def isreset(self, pos):
+        x, y = pos
+        if 670 >= x >= 590 and 50 <= y <= 130:
+            return True
+        return False
+
+    def iscomputer(self, pos):
+        x, y = pos
+        if 590 <= x <= 670 and 200 <= y <= 280:
+            return True
+        return False
+
+    def isauto(self, pos):
+        x, y = pos
+        if 590 <= x <= 670 and 340 <= y <= 420:
+            return True
+        return False
+
+    def isabletomove(self):
+        if (self.gameboard[self.ori_x][self.ori_y] == 1
+            and self.gameboard[self.new_x][self.new_y] != 1
+            and self.new_x - self.ori_x == 1
+            and self.ori_y - 1 <= self.new_y <= self.ori_y + 1
+            and not (self.ori_y == self.new_y and self.gameboard[self.new_x][self.new_y] == 2)) \
+            or (self.gameboard[self.ori_x][self.ori_y] == 2
+                and self.gameboard[self.new_x][self.new_y] != 2
+                and self.ori_x - self.new_x == 1
+                and self.ori_y - 1 <= self.new_y <= self.ori_y + 1
+                and not (self.ori_y == self.new_y and self.gameboard[self.new_x][self.new_y] == 1)):
+            return 1
+        return 0
+
+    def ai_move(self, searchtype, evaluation):
+        if searchtype == 1:
+            return self.ai_move_minimax(evaluation)
+        elif searchtype == 2:
+            return self.ai_move_alphabeta(evaluation)
+
+    def ai_move_minimax(self, function_type):
+        board, nodes, piece = MinMaxAgent(self.gameboard, self.turn, 3, function_type).minimax_decision()
+        self.gameboard = board.getMatrix()
+        if self.turn == 1:
+            self.total_nodes_1 += nodes
+            self.turn = 2
+        elif self.turn == 2:
+            self.total_nodes_2 += nodes
+            self.turn = 1
+        self.eat_piece = 16 - piece
+        if self.isgoalstate():
+            self.status = 3
+            #print(self.gameboard)
+
+    def ai_move_alphabeta(self, function_type):
+        board, nodes, piece = AlphaBetaAgent(self.gameboard, self.turn, 5, function_type).alpha_beta_decision()
+        self.gameboard = board.getMatrix()
+        if self.turn == 1:
+            self.total_nodes_1 += nodes
+            self.turn = 2
+        elif self.turn == 2:
+            self.total_nodes_2 += nodes
+            self.turn = 1
+        self.eat_piece = 16 - piece
+        if self.isgoalstate():
+            self.status = 3
+
+    def isgoalstate(self, base=0):
+        if base == 0:
+            if 2 in self.gameboard[0] or 1 in self.gameboard[7]:
+                return True
             else:
-                WIN.blit(DARK_BOARD_SQUARE, (x * GRID_SIZE, y * GRID_SIZE))
-                pygame.draw.rect(WIN, WHITE, (x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE), 1)
+                for line in self.gameboard:
+                    if 1 in line or 2 in line:
+                        return False
+            return True
+        else:
+            count = 0
+            for i in self.gameboard[0]:
+                if i == 2:
+                    count += 1
+            if count == 3:
+                return True
+            count = 0
+            for i in self.gameboard[7]:
+                if i == 1:
+                    count += 1
+            if count == 3:
+                return True
+            count1 = 0
+            count2 = 0
+            for line in self.gameboard:
+                for i in line:
+                    if i == 1:
+                        count1 += 1
+                    elif i == 2:
+                        count2 += 1
+            if count1 <= 2 or count2 <= 2:
+                return True
+        return False
 
-    pygame
-
-
-def draw_pieces():
-
-    for row in range(len(gameboard)):
-        for col in range(len(gameboard[row])):
-            if gameboard[row][col] == 'b':
-                P1_rect.center = ((col*GRID_SIZE)+(GRID_SIZE/2), (row*GRID_SIZE)+(GRID_SIZE/2))
-                gameboard[row][col] = WIN.blit(P1, P1_rect)
-
-            elif gameboard[row][col] == 'w':
-                P2_rect.center = ((col*GRID_SIZE)+(GRID_SIZE/2), (row*GRID_SIZE)+(GRID_SIZE/2))
-                gameboard[row][col] = WIN.blit(P2, P2_rect)
-
-
-def player_turn():
-    pass
-
-
-def click_piece():
-    mouse_pos = pygame.mouse.get_pos()
-    if P1_rect.collidepoint(mouse_pos):
-        pygame.mouse.get_pressed()
-        # HIGHLIGHT THE P1 PIECE IN YELLOW SQUARE
-    elif P2_rect.collidepoint(mouse_pos):
-        pygame.mouse.get_pressed()
-        # HIGHLIGHT THE P2 PIECE IN YELLOW SQUARE
-
-
-def check_collision():
-    pass
+def main():
+    game = BreakthroughG()
+    while 1:
+        game.run()
 
 
-def check_available_moves():
-    pass
-
-
-def check_win():
-    pass
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
 
