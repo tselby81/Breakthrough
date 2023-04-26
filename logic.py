@@ -8,20 +8,20 @@ win-conditions, offensive functions(agent focuses on moving forward and capturin
 and defensive functions(agent focuses on defending territory and preventing opponent from capturing pieces.)
 """
 
-initial_boardmatrix =  [[1, 1, 1, 1, 1, 1, 1, 1],
-                        [1, 1, 1, 1, 1, 1, 1, 1],
-                        [0, 0, 0, 0, 0, 0, 0, 0],
-                        [0, 0, 0, 0, 0, 0, 0, 0],
-                        [0, 0, 0, 0, 0, 0, 0, 0],
-                        [0, 0, 0, 0, 0, 0, 0, 0],
-                        [2, 2, 2, 2, 2, 2, 2, 2],
-                        [2, 2, 2, 2, 2, 2, 2, 2]]
+initial_gameboard =  [[1, 1, 1, 1, 1, 1, 1, 1],
+                            [1, 1, 1, 1, 1, 1, 1, 1],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0, 0, 0, 0],
+                            [2, 2, 2, 2, 2, 2, 2, 2],
+                            [2, 2, 2, 2, 2, 2, 2, 2]]
 
 
-MAXVAL = float("inf")
-MINVAL = -float("inf")
-MAXTUPLE = (MAXVAL, MAXVAL)
-MINTUPLE = (MINVAL, MINVAL)
+MAXNUM = float("inf")
+MINNUM = -float("inf")
+MAXTUPLE = (MAXNUM, MAXNUM)
+MINTUPLE = (MINNUM, MINNUM)
 
 # direction: 1 -> left, 2 -> middle, 3 -> right
 def single_move(initial_pos, direction, turn):
@@ -58,7 +58,7 @@ class Action:
 
 class State:
     def __init__(self,
-                 boardmatrix=None,
+                 gameboard=None,
                  black_position=None,
                  white_position=None,
                  black_num=0,
@@ -81,15 +81,15 @@ class State:
         self.white_num = white_num
         self.turn = turn
         self.function = function
-        if boardmatrix is not None:
-            # self.wide = len(boardmatrix[0])
-            # self.height = len(boardmatrix)
+        if gameboard is not None:
+            # self.wide = len(gameboard[0])
+            # self.height = len(gameboard)
             for i in range(self.height):
                 for j in range(self.width):
-                    if boardmatrix[i][j] == 1:
+                    if gameboard[i][j] == 1:
                         self.black_positions.append((i, j))
                         self.black_num += 1
-                    if boardmatrix[i][j] == 2:
+                    if gameboard[i][j] == 2:
                         self.white_positions.append((i, j))
                         self.white_num += 1
 
