@@ -40,7 +40,7 @@ def single_move(initial_pos, direction, turn):
         elif direction == 3:
             return initial_pos[0] - 1, initial_pos[1] + 1
 
-def alterturn(turn):
+def alternate_turns(turn):
     if turn == 1:
         return 2
     if turn == 2:
@@ -120,34 +120,34 @@ class State:
             else:
                 print("Invalid action!")
 
-        state = State(black_position=black_pos, white_position=white_pos, black_num=self.black_num, white_num=self.white_num, turn=alterturn(action.turn), function=self.function, height=self.height, width=self.width)
+        state = State(black_position=black_pos, white_position=white_pos, black_num=self.black_num, white_num=self.white_num, turn=alternate_turns(action.turn), function=self.function, height=self.height, width=self.width)
         return state
 
-    def available_actions(self):
-        available_actions = []
+    def check_possible_actions(self):
+        possible_actions = []
         if self.turn == 1:
             for pos in sorted(self.black_positions, key=lambda p: (p[0], -p[1]), reverse=True):
                 # ======Caution!======
                 if pos[0] != self.height - 1 and pos[1] != 0 and (pos[0] + 1, pos[1] - 1) not in self.black_positions:
-                    available_actions.append(Action(pos, 1, 1))
+                    possible_actions.append(Action(pos, 1, 1))
                 if pos[0] != self.height - 1 and (pos[0] + 1, pos[1]) not in self.black_positions and (pos[0] + 1, pos[1]) not in self.white_positions:
-                    available_actions.append(Action(pos, 2, 1))
+                    possible_actions.append(Action(pos, 2, 1))
                 if pos[0] != self.height - 1 and pos[1] != self.width - 1 and (pos[0] + 1, pos[1] + 1) not in self.black_positions:
-                    available_actions.append(Action(pos, 3, 1))
+                    possible_actions.append(Action(pos, 3, 1))
 
         elif self.turn == 2:
             for pos in sorted(self.white_positions, key=lambda p: (p[0], p[1])):
                 # ======Caution!======
                 if pos[0] != 0 and pos[1] != 0 and (pos[0] - 1, pos[1] - 1) not in self.white_positions:
-                    available_actions.append(Action(pos, 1, 2))
+                    possible_actions.append(Action(pos, 1, 2))
                 if pos[0] != 0 and (pos[0] - 1, pos[1]) not in self.black_positions and (pos[0] - 1, pos[1]) not in self.white_positions:
-                    available_actions.append(Action(pos, 2, 2))
+                    possible_actions.append(Action(pos, 2, 2))
                 if pos[0] != 0 and pos[1] != self.width - 1 and (pos[0] - 1, pos[1] + 1) not in self.white_positions:
-                    available_actions.append(Action(pos, 3, 2))
+                    possible_actions.append(Action(pos, 3, 2))
 
-        return available_actions
+        return possible_actions
 
-    def getMatrix(self):
+    def get_board(self):
         matrix = [[0 for _ in range(self.width)] for _ in range(self.height)]
         for item in self.black_positions:
             matrix[item[0]][item[1]] = 1
