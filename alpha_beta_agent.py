@@ -73,6 +73,9 @@ class AlphaBetaAgent:
             if minresult > v:
                 final_action = action
                 v = minresult
+            alpha = max(alpha, v - 1)
+            if alpha >= beta:
+                break
         print(v)
         if self.turn == 1:
             self.piece_num = initialstate.transfer(final_action).white_num
